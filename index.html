@@ -1,0 +1,156 @@
+<head>
+<style>
+ :root {
+   --button-size: 40px;
+   --small-button-size: 20px;
+ }
+
+ body {
+  background-color: #000;
+  margin: 10px;
+ }
+
+ .margined {
+  margin: 10px 10px 0px 0px;
+  display: table;
+  border-collapse: collapse;
+ }
+ 
+ td {
+  padding: 0px;
+ }
+
+ .side {
+  padding: 0px 0px 0px 5px;
+ }
+
+ .top {
+  vertical-align: top;
+ }
+
+ .bottom {
+  vertical-align: bottom;
+ }
+
+ .white {
+  background-color: #fff;
+ }
+
+ .button {
+  text-align: center;
+  width: var(--button-size);
+  height: var(--button-size);
+  line-height: var(--button-size);
+ }
+
+ .small {
+  width: var(--small-button-size);
+  height: var(--small-button-size);
+  line-height: var(--small-button-size);
+ }
+
+</style>
+</head>
+<body>
+<div id='pages'></div>
+<div class='inline-block margined white button' id='add' onclick='createPage()'>+</div>
+<script>
+pageNum = 1
+drawingAreaWidth = 800
+drawingAreaHeight = 500
+pages = document.getElementById('pages');
+lastCanvas = null;
+is_drawing = false;
+
+function get_xy(obj, e) {
+ event = e.type.startsWith('touch') ? e.changedTouches[0] : e;
+ return {x: event.pageX - obj.offsetLeft,
+         y: event.pageY - obj.offsetTop}
+}
+
+function draw_start(e) {
+ e.preventDefault();
+ this._xy = get_xy(this, e);
+ is_drawing = true;
+ lastCanvas = this;
+}
+
+function draw(e) {
+ e.preventDefault();
+ do_draw(this, e);
+}
+
+function draw_end(e) {
+ e.preventDefault();
+ do_draw(this, e);
+ is_drawing = false;
+}
+
+function do_draw(canvas, e) {
+ if (is_drawing && lastCanvas == canvas) {
+  new_xy = get_xy(canvas, e);
+  context = canvas.getContext('2d');
+  if (canvas._xy.x >= 0) {
+   context.beginPath();
+   context.moveTo(canvas._xy.x, canvas._xy.y);
+   context.lineTo(new_xy.x, new_xy.y);
+   context.closePath();
+   context.stroke();
+  };
+  canvas._xy = new_xy;
+ }
+}
+
+function remove() {
+ pages.removeChild(this._reference);
+}
+
+function clean() {
+ this._reference.getContext('2d').clearRect(0, 0, this._reference.width, this._reference.height);
+}
+
+function addButton(parent, reference, action, text) {
+ button = document.createElement('div');
+ button.setAttribute('class', 'small white button');
+ button.innerHTML = text;
+ button._reference = reference;
+ button.addEventListener('mousedown', action);
+ parent.appendChild(button);
+}
+
+function createPage() {
+ table = document.createElement('table');
+ table.setAttribute('class', 'margined');
+ tr = document.createElement('tr');
+ canvas_td = document.createElement('td');
+ canvas_td.setAttribute('rowspan', 2);
+ canvas = document.createElement('canvas');
+ canvas.setAttribute('width', drawingAreaWidth);
+ canvas.setAttribute('height', drawingAreaHeight);
+ canvas.setAttribute('id', 'drawing' + pageNum);
+ canvas.setAttribute('class', 'white');
+ canvas._xy = {x: -1, y: -1};
+ canvas.addEventListener('mousedown', draw_start);
+ canvas.addEventListener('mousemove', draw);
+ canvas.addEventListener('mouseup', draw_end);
+ canvas.addEventListener('touchstart', draw_start);
+ canvas.addEventListener('touchmove', draw);
+ canvas.addEventListener('touchend', draw_end);
+ pages.appendChild(table);
+ table.appendChild(tr);
+ tr.appendChild(canvas_td); 
+ canvas_td.appendChild(canvas);
+ top_button_td = document.createElement('td');
+ top_button_td.setAttribute('class', 'side top');
+ tr.appendChild(top_button_td);
+ addButton(top_button_td, table, remove, 'X');
+ tr2 = document.createElement('tr');
+ table.appendChild(tr2);
+ bottom_button_td = document.createElement('td');
+ bottom_button_td.setAttribute('class', 'side bottom');
+ tr2.appendChild(bottom_button_td);
+ addButton(bottom_button_td, canvas, clean, 'O');
+ pageNum++;
+}
+</script>
+</body>
