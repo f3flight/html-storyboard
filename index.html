@@ -15,7 +15,7 @@
   display: table;
   border-collapse: collapse;
  }
- 
+
  td {
   padding: 0px;
  }
@@ -55,17 +55,40 @@
 <div id='pages'></div>
 <div class='inline-block margined white button' id='add' onclick='createPage()'>+</div>
 <script>
-pageNum = 1
-drawingAreaWidth = 800
-drawingAreaHeight = 500
-pages = document.getElementById('pages');
-lastCanvas = null;
-is_drawing = false;
+ pageNum = 1
+ drawingAreaWidth = 800
+ drawingAreaHeight = 500
+ pages = document.getElementById('pages');
+ lastCanvas = null;
+ is_drawing = false;
+ draw_color = '#000000';
+ line_width = 2;
+
+ function getPosition(el) {
+  var xPos = 0;
+  var yPos = 0;
+  while (el) {
+    if (el.tagName == "BODY") {
+      // deal with browser quirks with body/window/document and page scroll
+      var xScroll = el.scrollLeft || document.documentElement.scrollLeft;
+      var yScroll = el.scrollTop || document.documentElement.scrollTop;
+      xPos += (el.offsetLeft - xScroll + el.clientLeft);
+      yPos += (el.offsetTop - yScroll + el.clientTop);
+    } else {
+      // for all other non-BODY elements
+      xPos += (el.offsetLeft - el.scrollLeft + el.clientLeft);
+      yPos += (el.offsetTop - el.scrollTop + el.clientTop);
+    }
+    el = el.offsetParent;
+  }
+  return {x: xPos,y: yPos};
+}
 
 function get_xy(obj, e) {
  event = e.type.startsWith('touch') ? e.changedTouches[0] : e;
- return {x: event.pageX - obj.offsetLeft,
-         y: event.pageY - obj.offsetTop}
+ obj_pos = getPosition(obj);
+ return {x: event.clientX - obj_pos.x,
+         y: event.clientY - obj_pos.y}
 }
 
 function draw_start(e) {
@@ -91,6 +114,8 @@ function do_draw(canvas, e) {
   new_xy = get_xy(canvas, e);
   context = canvas.getContext('2d');
   if (canvas._xy.x >= 0) {
+   context.strokeStyle = draw_color;
+   context.lineWidth = line_width;
    context.beginPath();
    context.moveTo(canvas._xy.x, canvas._xy.y);
    context.lineTo(new_xy.x, new_xy.y);
@@ -138,7 +163,7 @@ function createPage() {
  canvas.addEventListener('touchend', draw_end);
  pages.appendChild(table);
  table.appendChild(tr);
- tr.appendChild(canvas_td); 
+ tr.appendChild(canvas_td);
  canvas_td.appendChild(canvas);
  top_button_td = document.createElement('td');
  top_button_td.setAttribute('class', 'side top');
@@ -154,3 +179,4 @@ function createPage() {
 }
 </script>
 </body>
+
