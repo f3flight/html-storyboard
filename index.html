@@ -9,19 +9,22 @@
   background-color: #000;
   margin: 10px;
  }
+ 
+ #pages {
+  display: flex;
+  flex-wrap: wrap;
+ }
 
  .margined {
-  margin: 10px 10px 0px 0px;
-  display: table;
+  margin: 0px 10px 10px 0px;
+ }
+ 
+ table {
   border-collapse: collapse;
  }
 
  td {
   padding: 0px;
- }
-
- .side {
-  padding: 0px 0px 0px 5px;
  }
 
  .top {
@@ -44,6 +47,9 @@
  }
 
  .small {
+  border-style: solid;
+  border-color: gray;
+  border-width: 0px 0px 0px 2px;
   width: var(--small-button-size);
   height: var(--small-button-size);
   line-height: var(--small-button-size);
@@ -53,7 +59,7 @@
 </head>
 <body>
 <div id='pages'></div>
-<div class='inline-block margined white button' id='add' onclick='createPage()'>+</div>
+<div class='margined white button' id='add' onclick='createPage()'>+</div>
 <script>
  pageNum = 1
  drawingAreaWidth = 800
@@ -166,13 +172,13 @@ function createPage() {
  tr.appendChild(canvas_td);
  canvas_td.appendChild(canvas);
  top_button_td = document.createElement('td');
- top_button_td.setAttribute('class', 'side top');
+ top_button_td.setAttribute('class', 'top');
  tr.appendChild(top_button_td);
  addButton(top_button_td, table, remove, 'X');
  tr2 = document.createElement('tr');
  table.appendChild(tr2);
  bottom_button_td = document.createElement('td');
- bottom_button_td.setAttribute('class', 'side bottom');
+ bottom_button_td.setAttribute('class', 'bottom');
  tr2.appendChild(bottom_button_td);
  addButton(bottom_button_td, canvas, clean, 'O');
  pageNum++;
