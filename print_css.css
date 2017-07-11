@@ -1,3 +1,7 @@
 .button {
   display: none;
 }
+
+body {
+  background: white;
+}
