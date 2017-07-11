@@ -1,4 +1,4 @@
-.button {
+.button, .console, .console_placeholder {
   display: none;
 }
 
