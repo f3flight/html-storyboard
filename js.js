@@ -9,6 +9,11 @@
     console.scrollTop = console.scrollHeight;
   }
 
+  function HTR(h) {return parseInt((cutHex(h)).substring(0,2),16);}
+  function HTG(h) {return parseInt((cutHex(h)).substring(2,4),16);}
+  function HTB(h) {return parseInt((cutHex(h)).substring(4,6),16);}
+  function cutHex(h) {return (h.charAt(0)=="#") ? h.substring(1,7):h;}
+
   function getPosition(el) {
     var xPos = 0,
       yPos = 0,
@@ -49,6 +54,7 @@
     last_canvas = null,
     is_drawing = false,
     draw_color = '#000000',
+    draw_alpha = '1.0',
     line_width = 2,
     do_draw = function (canvas, e) {
       if (is_drawing && last_canvas === canvas) {
@@ -56,7 +62,10 @@
           context = canvas.getContext('2d');
         if (canvas._xy.x >= 0) {
           context.strokeStyle = draw_color;
+          context.globalAlpha = draw_alpha;
           context.lineWidth = line_width;
+          context.lineCap = 'round';
+          context.lineJoin = 'round';
           context.beginPath();
           context.moveTo(canvas._xy.x, canvas._xy.y);
           context.lineTo(new_xy.x, new_xy.y);
@@ -131,6 +140,12 @@
       file_input.setAttribute('style', 'display: none');
       file_input.addEventListener('change', load_do);
       file_input.click();
+    },
+    set_alpha = function () {
+      draw_alpha = this.value / 255;
+    },
+    set_size = function () {
+      line_width = this.value;
     },
     set_color = function () {
       draw_color = this.value;
@@ -230,5 +245,7 @@
   document.getElementById('add').addEventListener('click', create_page);
   document.getElementById('save_all').addEventListener('click', save_all);
   document.getElementById('console')._line_num = 0;
+  document.getElementById('alpha_picker').addEventListener('change', set_alpha);
+  document.getElementById('size_picker').addEventListener('change', set_size);
   document.getElementById('color_picker').addEventListener('change', set_color);
 }());

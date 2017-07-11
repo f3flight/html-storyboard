@@ -114,11 +114,18 @@ canvas {
   border-width: var(--bw) var(--bw) var(--bw) 0;
 }
 
-.color {
+.floating_controls {
   position: fixed;
   right: 0px;
   bottom: 0px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   margin: var(--small-margin);
+}
+
+#size_picker {
+  width: 200px;
 }
 
 .console_placeholder {
