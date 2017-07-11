@@ -35,9 +35,7 @@
     };
   }
 
-  var drawing_area_width = 800,
-    drawing_area_height = 500,
-    pages = document.getElementById('pages'),
+  var pages = document.getElementById('pages'),
     last_canvas = null,
     is_drawing = false,
     draw_color = '#000000',
@@ -115,15 +113,19 @@
   function createPage() {
     var table = document.createElement('table'),
       tr = document.createElement('tr'),
+      tr2 = document.createElement('tr'),
+      tr3 = document.createElement('tr'),
       canvas_td = document.createElement('td'),
       canvas = document.createElement('canvas'),
       top_button_td = document.createElement('td'),
-      tr2 = document.createElement('tr'),
-      bottom_button_td = document.createElement('td');
+      bottom_button_td = document.createElement('td'),
+      caption_td = document.createElement('td'),
+      caption = document.createElement('div');
     table.setAttribute('class', 'margined');
     canvas_td.setAttribute('rowspan', 2);
-    canvas.setAttribute('width', drawing_area_width);
-    canvas.setAttribute('height', drawing_area_height);
+    canvas.setAttribute('class', 'border white');
+    canvas.setAttribute('width', '800px');
+    canvas.setAttribute('height', '500px');
     canvas.setAttribute('class', 'border white');
     canvas._xy = {
       x: -1,
@@ -145,10 +147,17 @@
     table.appendChild(tr2);
     bottom_button_td.setAttribute('class', 'bottom');
     tr2.appendChild(bottom_button_td);
-    addButton(bottom_button_td, canvas, load_image, 'L');
+    addButton(bottom_button_td, canvas, load_image, 'LOAD');
     bottom_button_td.setAttribute('class', 'bottom');
     tr2.appendChild(bottom_button_td);
-    addButton(bottom_button_td, canvas, clean, 'O');
+    addButton(bottom_button_td, canvas, clean, 'WIPE');
+    table.appendChild(tr3);
+    caption_td.setAttribute('class', 'caption_td');
+    tr3.appendChild(caption_td);
+    caption.setAttribute('contenteditable', 'true');
+    caption.setAttribute('class', 'white border caption');
+    caption.setAttribute('placeholder', 'caption');
+    caption_td.appendChild(caption);
   }
 
   function disable_default_mouse_action(e) {
@@ -156,14 +165,19 @@
   }
 
   function keep_drawing(e) {
-    e.preventDefault();
     if (last_canvas && is_drawing) {
       do_draw(last_canvas, e);
     }
   }
+  
+  function stop_drawing(e) {
+    if (last_canvas && is_drawing) {
+      do_draw(last_canvas, e);
+      is_drawing = false;
+    }
+  }
 
-  document.addEventListener('mousedown', disable_default_mouse_action);
   document.addEventListener('mousemove', keep_drawing);
-  document.addEventListener('mouseup', disable_default_mouse_action);
+  document.addEventListener('mouseup', stop_drawing);
   document.getElementById('add').addEventListener('click', createPage);
 }());

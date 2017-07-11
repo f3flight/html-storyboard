@@ -1,40 +1,89 @@
 :root {
-  --button-size: 6em;
-  --small-button-size: 3em;
+  --button-size: 50px;
+  --small-button-size: 50px;
+  --bw: 4px;
   --border-color: #ccc;
+  --canvas-width: 800px;
 }
+
 body {
   background-color: #333;
   margin: 0.5em;
 }
-table {border-spacing: 0;}
-td {padding: 0;}
+
+table {
+  border-spacing: 0;
+}
+
+td {
+  padding: 0;
+}
+
 #pages {
   display: flex;
   flex-wrap: wrap;
 }
+
 .margined {
   margin: 0 0.5em 0.5em 0;
 }
+
 .border {
   border-style: solid;
-  border-collapse: collapse;
   border-color: var(--border-color);
-  border-width: 0.25em;
+  border-width: var(--bw);
 }
-.white {background-color: white;}
-.top {vertical-align: top;}
-.bottom {vertical-align: bottom;}
+
+.white {
+  background-color: white;
+}
+
+.top {
+  vertical-align: top;
+}
+
+.bottom {
+  vertical-align: bottom;
+}
+
 .button {
   text-align: center;
   width: var(--button-size);
   height: var(--button-size);
   line-height: var(--button-size);
 }
+
+.bottom .button {
+  margin: 0.5em 0 0 0;
+}
+
+.top .button {
+  margin: 0 0 0.5em 0;
+}
+
+.caption_td {
+  max-width: var(--canvas-width);
+}
+
+.caption {
+  border-style: solid;
+  border-width: 0 var(--bw) var(--bw) var(--bw);
+  font-size: 20px;
+  color: black;
+  padding: 5px;
+}
+
+[contenteditable=true]:empty:before {
+  content: attr(placeholder);
+  color: gray;
+}
+
 .small {
   width: var(--small-button-size);
   height: var(--small-button-size);
   line-height: var(--small-button-size);
 }
 
-.right-side {border-width: 0.25em 0.25em 0.25em 0;}
+.right-side {
+  border-width: var(--bw) var(--bw) var(--bw) 0;
+}
