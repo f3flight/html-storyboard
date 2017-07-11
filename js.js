@@ -86,12 +86,16 @@
       this._reference.getContext('2d').clearRect(0, 0, this._reference.width, this._reference.height);
     },
     save = function () {
-      var canvases = Array.prototype.slice.call(document.getElementsByTagName('canvas')),
-        header_text = document.getElementById('header').value,
+      var canvases = document.getElementsByTagName('canvas'),
+        canvases_arr = Array.prototype.slice.call(canvases),
+        index = canvases_arr.indexOf(this._reference),
+        header_value = document.getElementById('header').value,
+        header_placeholder = document.getElementById('header').placeholder,
+        filename = header_value ? header_value : header_placeholder,
         data_url = this._reference.toDataURL("image/png"),
         a = document.createElement('a');
-      header_text = header_text ? header_text.replace(' ','_').replace(/([^a-z0-9_]+)/gi, '').toLowerCase() : 'storyboard_untitled';
-      a.setAttribute('download', header_text + '_' + canvases.indexOf(this._reference) + '.png');
+      filename = filename.replace(' ','_').replace(/([^a-z0-9_]+)/gi, '').toLowerCase();
+      a.setAttribute('download', filename + '_' + index + '.png');
       a.setAttribute('href', data_url);
       a.click();
     },
