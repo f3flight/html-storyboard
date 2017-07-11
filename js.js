@@ -1,6 +1,14 @@
 (function () {
   "use strict";
   /*jslint nomen: true*/
+  function log(text) {
+    var console = document.getElementById('console');
+    console.innerHTML += '<br>';
+    console.innerHTML += console._line_num + ': ' + text;
+    console._line_num += 1;
+    console.scrollTop = console.scrollHeight;
+  }
+
   function getPosition(el) {
     var xPos = 0,
       yPos = 0,
@@ -77,15 +85,24 @@
     clean = function () {
       this._reference.getContext('2d').clearRect(0, 0, this._reference.width, this._reference.height);
     },
-    load_image = function () {
+    load = function () {
+      log('load');
       var file_input = document.createElement('input'),
         ctx = this._reference.getContext('2d'),
         image = new Image(),
-        self_destruct = function () {
+        load_do = function () {
+          log('load_do');
           if (this.files.length > 0) {
+            log('load_do - file(s) selected');
+            log('load_do - files[0] = ' + this.files[0]);
+            log('load_do - files[0].type = ' + this.files[0].type);
+            log('load_do - files[0].size = ' + this.files[0].size);
             var file_reader = new FileReader();
-            file_reader.onload = function (e) {
+            file_reader._input = this;
+            file_reader.onloadend = function (e) {
+              log('file_reader.onloadend - setting image src');
               image.onload = function (e) {
+                log('image.onload - drawing');
                 ctx.drawImage(e.target, 0, 0);
               };
               image.src = e.target.result;
@@ -95,7 +112,7 @@
         };
       file_input.setAttribute('type', 'file');
       file_input.setAttribute('style', 'display: none');
-      file_input.addEventListener('change', self_destruct);
+      file_input.addEventListener('change', load_do);
       file_input.click();
     };
 
@@ -147,7 +164,7 @@
     table.appendChild(tr2);
     bottom_button_td.setAttribute('class', 'bottom');
     tr2.appendChild(bottom_button_td);
-    addButton(bottom_button_td, canvas, load_image, 'LOAD');
+    addButton(bottom_button_td, canvas, load, 'LOAD');
     bottom_button_td.setAttribute('class', 'bottom');
     tr2.appendChild(bottom_button_td);
     addButton(bottom_button_td, canvas, clean, 'WIPE');
@@ -180,4 +197,5 @@
   document.addEventListener('mousemove', keep_drawing);
   document.addEventListener('mouseup', stop_drawing);
   document.getElementById('add').addEventListener('click', createPage);
+  document.getElementById('console')._line_num = 0;
 }());
