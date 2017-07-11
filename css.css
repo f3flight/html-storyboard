@@ -1,0 +1,40 @@
+:root {
+  --button-size: 6em;
+  --small-button-size: 3em;
+  --border-color: #ccc;
+}
+body {
+  background-color: #333;
+  margin: 0.5em;
+}
+table {border-spacing: 0;}
+td {padding: 0;}
+#pages {
+  display: flex;
+  flex-wrap: wrap;
+}
+.margined {
+  margin: 0 0.5em 0.5em 0;
+}
+.border {
+  border-style: solid;
+  border-collapse: collapse;
+  border-color: var(--border-color);
+  border-width: 0.25em;
+}
+.white {background-color: white;}
+.top {vertical-align: top;}
+.bottom {vertical-align: bottom;}
+.button {
+  text-align: center;
+  width: var(--button-size);
+  height: var(--button-size);
+  line-height: var(--button-size);
+}
+.small {
+  width: var(--small-button-size);
+  height: var(--small-button-size);
+  line-height: var(--small-button-size);
+}
+
+.right-side {border-width: 0.25em 0.25em 0.25em 0;}
