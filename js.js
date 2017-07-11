@@ -44,6 +44,8 @@
   }
 
   var pages = document.getElementById('pages'),
+    canvas_w = getComputedStyle(document.body).getPropertyValue('--canvas-width'),
+    canvas_h = getComputedStyle(document.body).getPropertyValue('--canvas-height'),
     last_canvas = null,
     is_drawing = false,
     draw_color = '#000000',
@@ -158,6 +160,8 @@
     canvas_td.setAttribute('rowspan', 2);
     canvas.setAttribute('class', 'border white');
     canvas.setAttribute('class', 'border white');
+    canvas.setAttribute('width', canvas_w);
+    canvas.setAttribute('height', canvas_h);
     canvas._xy = {
       x: -1,
       y: -1
@@ -172,8 +176,6 @@
     table.appendChild(tr);
     tr.appendChild(canvas_td);
     canvas_td.appendChild(canvas);
-    canvas.setAttribute('width', window.getComputedStyle(canvas).width);
-    canvas.setAttribute('height', window.getComputedStyle(canvas).height);
     top_button_td.setAttribute('class', 'top');
     tr.appendChild(top_button_td);
     addButton(top_button_td, table, remove, 'X');
