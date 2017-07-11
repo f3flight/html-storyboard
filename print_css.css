@@ -1,4 +1,6 @@
-.button, .console, .console_placeholder {
+.button,
+.console,
+.console_placeholder {
   display: none;
 }
 

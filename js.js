@@ -94,7 +94,7 @@
         filename = header_value ? header_value : header_placeholder,
         data_url = this._reference.toDataURL("image/png"),
         a = document.createElement('a');
-      filename = filename.replace(' ','_').replace(/([^a-z0-9_]+)/gi, '').toLowerCase();
+      filename = filename.replace(' ', '_').replace(/([^a-z0-9_]+)/gi, '').toLowerCase();
       a.setAttribute('download', filename + '_' + index + '.png');
       a.setAttribute('href', data_url);
       a.click();
@@ -129,6 +129,9 @@
       file_input.setAttribute('style', 'display: none');
       file_input.addEventListener('change', load_do);
       file_input.click();
+    },
+    set_color = function () {
+      draw_color = this.value;
     };
 
   function addButton(parent, reference, action, text) {
@@ -225,4 +228,5 @@
   document.getElementById('add').addEventListener('click', create_page);
   document.getElementById('save_all').addEventListener('click', save_all);
   document.getElementById('console')._line_num = 0;
+  document.getElementById('color_picker').addEventListener('change', set_color);
 }());

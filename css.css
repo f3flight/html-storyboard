@@ -50,7 +50,7 @@ canvas {
   margin-top: var(--small-margin);
   margin-left: var(--small-margin);
   margin-right: calc(var(--large-margin) - var(--small-margin));
-  margin-bottom:  calc(var(--large-margin) - var(--small-margin));
+  margin-bottom: calc(var(--large-margin) - var(--small-margin));
 }
 
 .border {
@@ -114,6 +114,13 @@ canvas {
   border-width: var(--bw) var(--bw) var(--bw) 0;
 }
 
+.color {
+  position: fixed;
+  right: 0px;
+  bottom: 0px;
+  margin: var(--small-margin);
+}
+
 .console_placeholder {
   width: 100%;
   height: 100px;
@@ -132,4 +139,8 @@ canvas {
   left: 0px;
   overflow-y: auto;
   font-family: monospace;
+}
+
+.hidden {
+  display: none;
 }
