@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  /*jslint nomen: true*/
+  /*jslint nomen: true */
   function log(text) {
     var console = document.getElementById('console');
     console.innerHTML += '<br>';
@@ -85,6 +85,13 @@
     clean = function () {
       this._reference.getContext('2d').clearRect(0, 0, this._reference.width, this._reference.height);
     },
+    save = function () {
+      var data_url = this._reference.toDataURL("image/png"),
+        a = document.createElement('a');
+      a.setAttribute('download', '');
+      a.setAttribute('href', data_url);
+      a.click();
+    },
     load = function () {
       log('load');
       var file_input = document.createElement('input'),
@@ -103,6 +110,7 @@
               log('file_reader.onloadend - setting image src');
               image.onload = function (e) {
                 log('image.onload - drawing');
+                ctx.clearRect(0, 0, 1000, 1000); //temporary numbers
                 ctx.drawImage(e.target, 0, 0);
               };
               image.src = e.target.result;
@@ -116,8 +124,6 @@
       file_input.click();
     };
 
-
-
   function addButton(parent, reference, action, text) {
     var button = document.createElement('div');
     button.setAttribute('class', 'right-side border small white button');
@@ -127,7 +133,7 @@
     parent.appendChild(button);
   }
 
-  function createPage() {
+  function create_page() {
     var table = document.createElement('table'),
       tr = document.createElement('tr'),
       tr2 = document.createElement('tr'),
@@ -164,9 +170,8 @@
     table.appendChild(tr2);
     bottom_button_td.setAttribute('class', 'bottom');
     tr2.appendChild(bottom_button_td);
+    addButton(bottom_button_td, canvas, save, 'SAVE');
     addButton(bottom_button_td, canvas, load, 'LOAD');
-    bottom_button_td.setAttribute('class', 'bottom');
-    tr2.appendChild(bottom_button_td);
     addButton(bottom_button_td, canvas, clean, 'WIPE');
     table.appendChild(tr3);
     caption_td.setAttribute('class', 'caption_td');
@@ -194,8 +199,23 @@
     }
   }
 
+  function save_all() {
+    var canvases = document.getElementsByTagName('canvas');
+    log(canvases.length);
+    for (var i = 0; i < canvases.length; i += 1) {
+      log('i = ' + i);
+      var data_url = canvases[i].toDataURL("image/png");
+      var a = document.createElement('a');
+      a.setAttribute('download', 'image' + i + '.png');
+      a.setAttribute('href', data_url);
+      a.click();
+      break;
+    }
+  }
+
   document.addEventListener('mousemove', keep_drawing);
   document.addEventListener('mouseup', stop_drawing);
-  document.getElementById('add').addEventListener('click', createPage);
+  document.getElementById('add').addEventListener('click', create_page);
+  document.getElementById('save_all').addEventListener('click', save_all);
   document.getElementById('console')._line_num = 0;
 }());
