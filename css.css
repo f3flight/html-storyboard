@@ -1,9 +1,10 @@
 :root {
-  --button-size: 50px;
-  --small-button-size: 50px;
+  --add-button-size: 50px;
+  --side-button-size: 50px;
   --bw: 4px;
   --border-color: #ccc;
   --canvas-width: 800px;
+  --canvas-height: 500px;
 }
 
 body {
@@ -17,6 +18,11 @@ table {
 
 td {
   padding: 0;
+}
+
+canvas {
+  width: var(--canvas-width);
+  height: var(--canvas-height);
 }
 
 #pages {
@@ -48,9 +54,9 @@ td {
 
 .button {
   text-align: center;
-  width: var(--button-size);
-  height: var(--button-size);
-  line-height: var(--button-size);
+  width: var(--add-button-size);
+  height: var(--add-button-size);
+  line-height: var(--add-button-size);
 }
 
 .bottom .button {
@@ -79,9 +85,9 @@ td {
 }
 
 .small {
-  width: var(--small-button-size);
-  height: var(--small-button-size);
-  line-height: var(--small-button-size);
+  width: var(--side-button-size);
+  height: var(--side-button-size);
+  line-height: var(--side-button-size);
 }
 
 .right-side {

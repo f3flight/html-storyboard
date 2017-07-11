@@ -124,8 +124,6 @@
     table.setAttribute('class', 'margined');
     canvas_td.setAttribute('rowspan', 2);
     canvas.setAttribute('class', 'border white');
-    canvas.setAttribute('width', '800px');
-    canvas.setAttribute('height', '500px');
     canvas.setAttribute('class', 'border white');
     canvas._xy = {
       x: -1,
@@ -141,6 +139,8 @@
     table.appendChild(tr);
     tr.appendChild(canvas_td);
     canvas_td.appendChild(canvas);
+    canvas.setAttribute('width', window.getComputedStyle(canvas).width);
+    canvas.setAttribute('height', window.getComputedStyle(canvas).height);
     top_button_td.setAttribute('class', 'top');
     tr.appendChild(top_button_td);
     addButton(top_button_td, table, remove, 'X');
@@ -169,7 +169,7 @@
       do_draw(last_canvas, e);
     }
   }
-  
+
   function stop_drawing(e) {
     if (last_canvas && is_drawing) {
       do_draw(last_canvas, e);
