@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  /*jslint nomen: true */
+  /*jshint browser: true */
   function log(text) {
     var console = document.getElementById('console');
     console.innerHTML += '<br>';
@@ -86,9 +86,12 @@
       this._reference.getContext('2d').clearRect(0, 0, this._reference.width, this._reference.height);
     },
     save = function () {
-      var data_url = this._reference.toDataURL("image/png"),
+      var canvases = Array.prototype.slice.call(document.getElementsByTagName('canvas')),
+        header_text = document.getElementById('header').value,
+        data_url = this._reference.toDataURL("image/png"),
         a = document.createElement('a');
-      a.setAttribute('download', '');
+      header_text = header_text ? header_text.replace(' ','_').replace(/([^a-z0-9_]+)/gi, '').toLowerCase() : 'storyboard_untitled';
+      a.setAttribute('download', header_text + '_' + canvases.indexOf(this._reference) + '.png');
       a.setAttribute('href', data_url);
       a.click();
     },

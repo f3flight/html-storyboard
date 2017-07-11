@@ -5,11 +5,26 @@
   --border-color: #ccc;
   --canvas-width: 800px;
   --canvas-height: 500px;
+  --small-margin: 10px;
+  --large-margin: 25px;
+  --padding: 5px;
+  --large-font: 30px;
 }
 
 body {
   background-color: #333;
   margin: 0;
+}
+
+#header {
+  box-sizing: border-box;
+  height: calc(var(--large-font) + 2*var(--padding));
+  width: calc(100% - 2*var(--small-margin));
+  border-width: var(--bw);
+  font-size: var(--large-font);
+  color: black;
+  padding: var(--padding);
+  margin-bottom: var(--large-margin);
 }
 
 table {
@@ -31,7 +46,10 @@ canvas {
 }
 
 .margined {
-  margin: 10px 15px 15px 10px;
+  margin-top: var(--small-margin);
+  margin-left: var(--small-margin);
+  margin-right: calc(var(--large-margin) - var(--small-margin));
+  margin-bottom:  calc(var(--large-margin) - var(--small-margin));
 }
 
 .border {
@@ -101,8 +119,8 @@ canvas {
 
 .console {
   position: fixed;
-  background-color: rgba(255,255,128,0.7);
-  border-color: rgb(255,255,128);
+  background-color: rgba(255, 255, 128, 0.7);
+  border-color: rgb(255, 255, 128);
   border-style: solid;
   border-width: 1px 0 0 5px;
   box-sizing: border-box;
