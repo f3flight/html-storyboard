@@ -130,8 +130,8 @@
               log('file_reader.onloadend - setting image src');
               image.onload = function (e) {
                 log('image.onload - drawing');
-                draw_context.globalAlpha = draw_alpha;
-                ctx.clearRect(0, 0, 1000, 1000); //temporary numbers
+                ctx.globalAlpha = draw_alpha;
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
                 ctx.drawImage(e.target, 0, 0);
               };
               image.src = e.target.result;
