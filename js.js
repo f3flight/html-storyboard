@@ -9,11 +9,6 @@
     console.scrollTop = console.scrollHeight;
   }
 
-  function HTR(h) {return parseInt((cutHex(h)).substring(0,2),16);}
-  function HTG(h) {return parseInt((cutHex(h)).substring(2,4),16);}
-  function HTB(h) {return parseInt((cutHex(h)).substring(4,6),16);}
-  function cutHex(h) {return (h.charAt(0)=="#") ? h.substring(1,7):h;}
-
   function getPosition(el) {
     var xPos = 0,
       yPos = 0,
@@ -51,44 +46,51 @@
   var pages = document.getElementById('pages'),
     canvas_w = getComputedStyle(document.body).getPropertyValue('--canvas-width'),
     canvas_h = getComputedStyle(document.body).getPropertyValue('--canvas-height'),
-    last_canvas = null,
-    is_drawing = false,
+    storage_canvas = document.createElement('canvas'),
+    points = [],
+    draw_context = null,
     draw_color = '#000000',
     draw_alpha = '1.0',
     line_width = 2,
-    do_draw = function (canvas, e) {
-      if (is_drawing && last_canvas === canvas) {
-        var new_xy = get_xy(canvas, e),
-          context = canvas.getContext('2d');
-        if (canvas._xy.x >= 0) {
-          context.strokeStyle = draw_color;
-          context.globalAlpha = draw_alpha;
-          context.lineWidth = line_width;
-          context.lineCap = 'round';
-          context.lineJoin = 'round';
-          context.beginPath();
-          context.moveTo(canvas._xy.x, canvas._xy.y);
-          context.lineTo(new_xy.x, new_xy.y);
-          context.closePath();
-          context.stroke();
-        }
-        canvas._xy = new_xy;
+    do_draw = function (e) {
+      draw_context.globalAlpha = 1.0;
+      draw_context.clearRect(0, 0,
+        draw_context.canvas.width,
+        draw_context.canvas.height);
+      draw_context.drawImage(storage_canvas, 0, 0);
+      draw_context.globalAlpha = draw_alpha;
+      points.push(get_xy(draw_context.canvas, e));
+      draw_context.beginPath();
+      draw_context.moveTo(points[0].x, points[0].y);
+      for (var i = 1; i < points.length; i++) {
+        draw_context.lineTo(points[i].x, points[i].y);
       }
+      draw_context.stroke();
     },
     draw_start = function (e) {
-      e.preventDefault();
-      this._xy = get_xy(this, e);
-      is_drawing = true;
-      last_canvas = this;
+      storage_canvas.setAttribute('width', e.target.width);
+      storage_canvas.setAttribute('height', e.target.height);
+      storage_canvas.getContext('2d').drawImage(e.target, 0, 0);
+      draw_context = e.target.getContext('2d');
+      draw_context.strokeStyle = draw_color;
+      draw_context.lineWidth = line_width;
+      draw_context.lineCap = 'round';
+      draw_context.lineJoin = 'round';
+      points.push(get_xy(e.target, e));
     },
-    draw = function (e) {
-      e.preventDefault();
-      do_draw(this, e);
+    draw_continue = function (e) {
+      if (draw_context) {
+        e.preventDefault();
+        do_draw(e);
+      }
     },
     draw_end = function (e) {
-      e.preventDefault();
-      do_draw(this, e);
-      is_drawing = false;
+      if (draw_context) {
+        e.preventDefault();
+        do_draw(e);
+        draw_context = null;
+        points = [];
+      }
     },
     remove = function () {
       pages.removeChild(this._reference);
@@ -182,10 +184,10 @@
       y: -1
     };
     canvas.addEventListener('mousedown', draw_start);
-    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mousemove', draw_continue);
     canvas.addEventListener('mouseup', draw_end);
     canvas.addEventListener('touchstart', draw_start);
-    canvas.addEventListener('touchmove', draw);
+    canvas.addEventListener('touchmove', draw_continue);
     canvas.addEventListener('touchend', draw_end);
     pages.appendChild(table);
     table.appendChild(tr);
@@ -209,27 +211,10 @@
     caption_td.appendChild(caption);
   }
 
-  function disable_default_mouse_action(e) {
-    e.preventDefault();
-  }
-
-  function keep_drawing(e) {
-    if (last_canvas && is_drawing) {
-      do_draw(last_canvas, e);
-    }
-  }
-
-  function stop_drawing(e) {
-    if (last_canvas && is_drawing) {
-      do_draw(last_canvas, e);
-      is_drawing = false;
-    }
-  }
-
   function save_all() {
     var canvases = document.getElementsByTagName('canvas');
     log(canvases.length);
-    for (var i = 0; i < canvases.length; i += 1) {
+    for (var i = 0; i < canvases.length; i++) {
       log('i = ' + i);
       var data_url = canvases[i].toDataURL("image/png");
       var a = document.createElement('a');
@@ -240,8 +225,8 @@
     }
   }
 
-  document.addEventListener('mousemove', keep_drawing);
-  document.addEventListener('mouseup', stop_drawing);
+  document.addEventListener('mousemove', draw_continue);
+  document.addEventListener('mouseup', draw_end);
   document.getElementById('add').addEventListener('click', create_page);
   document.getElementById('save_all').addEventListener('click', save_all);
   document.getElementById('console')._line_num = 0;

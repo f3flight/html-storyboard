@@ -122,6 +122,11 @@ canvas {
   flex-direction: row;
   align-items: center;
   margin: var(--small-margin);
+  color: white;
+}
+
+#alpha_picker {
+  width: 100px;
 }
 
 #size_picker {
