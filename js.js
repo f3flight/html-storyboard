@@ -125,11 +125,11 @@
             log('load_do - files[0].type = ' + this.files[0].type);
             log('load_do - files[0].size = ' + this.files[0].size);
             var file_reader = new FileReader();
-            file_reader._input = this;
+            file_reader.onerror = function () {log('file_reader - error');};
             file_reader.onloadend = function (e) {
-              log('file_reader.onloadend - setting image src');
+              log('file_reader.onloadend - error check: ' + this.error);
               image.onload = function (e) {
-                log('image.onload - drawing');
+                log('image.onload - error check: ' + !e.returnValue);
                 var w = e.target.naturalWidth,
                   h = e.target.naturalHeight,
                   w_scale = w / ctx.canvas.width,
@@ -150,6 +150,8 @@
       file_input.setAttribute('type', 'file');
       file_input.setAttribute('style', 'display: none');
       file_input.addEventListener('change', load_do);
+      image.onerror = function () {log('image - error');};
+      file_input.onerror = function () {log('file_input - error');};
       file_input.click();
     },
     set_alpha = function () {
