@@ -131,16 +131,16 @@
               image.onload = function (e) {
                 log('image.onload - drawing');
                 var w = e.target.naturalWidth,
-                    h = e.target.naturalHeight,
-                    w_scale = w / ctx.canvas.width,
-                    h_scale = w / ctx.canvas.width,
-                    scale = w_scale >= h_scale ? w_scale : h_scale;
+                  h = e.target.naturalHeight,
+                  w_scale = w / ctx.canvas.width,
+                  h_scale = w / ctx.canvas.width,
+                  scale = w_scale >= h_scale ? w_scale : h_scale;
                 ctx.globalAlpha = draw_alpha;
                 ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
                 ctx.drawImage(e.target,
-                              (ctx.canvas.width - w / scale) / 2,
-                              (ctx.canvas.height - h / scale) / 2,
-                             w / scale, h / scale);
+                  (ctx.canvas.width - w / scale) / 2,
+                  (ctx.canvas.height - h / scale) / 2,
+                  w / scale, h / scale);
               };
               image.src = e.target.result;
             };
