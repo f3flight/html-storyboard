@@ -130,6 +130,7 @@
               log('file_reader.onloadend - setting image src');
               image.onload = function (e) {
                 log('image.onload - drawing');
+                draw_context.globalAlpha = draw_alpha;
                 ctx.clearRect(0, 0, 1000, 1000); //temporary numbers
                 ctx.drawImage(e.target, 0, 0);
               };
@@ -225,10 +226,18 @@
     }
   }
 
+  function console_toggle() {
+    var console_ph = document.getElementById('console_placeholder'),
+      console = document.getElementById('console');
+    console_ph.style.display = console_ph.style.display === "block" ? "none" : "block";
+    console.style.display = console.style.display === "block" ? "none" : "block";
+  }
+
   document.addEventListener('mousemove', draw_continue);
   document.addEventListener('mouseup', draw_end);
   document.getElementById('add').addEventListener('click', create_page);
   document.getElementById('save_all').addEventListener('click', save_all);
+  document.getElementById('debug').addEventListener('click', console_toggle);
   document.getElementById('console')._line_num = 0;
   document.getElementById('alpha_picker').addEventListener('change', set_alpha);
   document.getElementById('size_picker').addEventListener('change', set_size);

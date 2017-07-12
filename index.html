@@ -4,16 +4,17 @@
 </head>
 
 <body>
-  <input type='text' id='header' class='border margined white' placeholder='untitled storyboard' />
+  <input id='header' type='text' class='border margined white' placeholder='untitled storyboard' />
   <div id='pages'></div>
-  <div class='border margined white button' id='add'>+</div>
-  <div class='border margined white button' id='save_all'>S ALL</div>
-  <div class='console_placeholder hidden'></div>
-  <div class='console hidden' id='console'>[debug console]</div>
+  <div id='add' class='border margined white button'>+</div>
+  <div id='save_all' class='border margined white button'>S ALL</div>
+  <div id='debug' class='border margined white button'>DBG</div>
+  <div id='console_placeholder' class='console_placeholder hidden'></div>
+  <div id='console' class='console hidden'>[debug console]</div>
   <div class='floating_controls'>
-    trans<input class='border button' type='range' id='alpha_picker' min='1' max='255' value='255'>opaque&nbsp;&nbsp;&nbsp;small
-    <input class='border button' type='range' id='size_picker' min='1' max='100' value='1'>large&nbsp;
-    <input class='border button' type='color' id='color_picker'>
+    trans<input id='alpha_picker' type='range' class='border button' min='1' max='255' value='255'>opaque&nbsp;&nbsp;&nbsp;small
+    <input id='size_picker' type='range' class='border button' min='1' max='100' value='1'>large&nbsp;
+    <input id='color_picker' type='color' class='border button'>
   </div>
   <script src='js.js'></script>
 </body>
