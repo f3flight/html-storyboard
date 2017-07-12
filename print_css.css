@@ -1,7 +1,16 @@
 .button,
+.floating_controls,
 .console,
 .console_placeholder {
   display: none;
+}
+
+table,
+tr,
+th,
+td,
+canvas {
+  page-break-inside: avoid;
 }
 
 body {
