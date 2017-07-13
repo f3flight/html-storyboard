@@ -1,5 +1,5 @@
 :root {
-  --add-button-size: 50px;
+  --add-button-size: 75px;
   --side-button-size: 50px;
   --bw: 4px;
   --border-color: #ccc;
@@ -112,6 +112,10 @@ canvas {
 
 .right-side {
   border-width: var(--bw) var(--bw) var(--bw) 0;
+}
+
+#buttons {
+  display: flex;
 }
 
 .floating_controls {

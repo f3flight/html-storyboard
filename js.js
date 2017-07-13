@@ -1,5 +1,5 @@
 /*jshint esversion: 6, browser: true */
-/*global JSZip */
+/*global alert, JSZip */
 (function () {
   "use strict";
 
@@ -48,8 +48,8 @@
     a.setAttribute('href', blob_or_dataurl);
     a.click();
   };
-  const f_gen_filename = (prefix, index, extension) => {
-    return prefix + '_' + index + '.' + extension;
+  const f_gen_filename = (prefix, index, maxindex, extension) => {
+    return prefix + '_' + f_padnum(index, maxindex) + '.' + extension;
   };
   const f_storyboard_filename_prefix = () => {
     const header_value = document.getElementById('header').value,
@@ -57,6 +57,7 @@
     let filename = header_value ? header_value : header_placeholder;
     return filename.replace(' ', '_').replace(/([^a-z0-9_]+)/gi, '').toLowerCase();
   };
+  const f_padnum = (num, max) => (num + '').length < (max + '').length ? "0".repeat((max + '').length - 1) + num : num + '';
 
   var pages = document.getElementById('pages'),
     canvas_w = getComputedStyle(document.body).getPropertyValue('--canvas-width'),
@@ -114,11 +115,10 @@
       this._reference.getContext('2d').clearRect(0, 0, this._reference.width, this._reference.height);
     },
     save_single = function () {
-      var canvases = document.getElementsByTagName('canvas'),
-        canvases_arr = Array.prototype.slice.call(canvases),
-        index = canvases_arr.indexOf(this._reference),
+      const index = [...document.getElementsByTagName('canvas')].indexOf(this._reference),
+        maxindex = document.getElementsByTagName('canvas').length - 1,
         data_url = this._reference.toDataURL("image/png");
-      f_save_as(data_url, f_gen_filename(f_storyboard_filename_prefix(), index, 'png'));
+      f_save_as(data_url, f_gen_filename(f_storyboard_filename_prefix(), index, maxindex, 'png'));
     },
     load = function () {
       f_log('load');
@@ -234,6 +234,7 @@
     caption.setAttribute('class', 'white border caption');
     caption.setAttribute('placeholder', 'caption');
     caption_td.appendChild(caption);
+    return canvas;
   }
 
   function save_all() {
@@ -251,14 +252,54 @@
       const zip = new JSZip(),
         prefix = f_storyboard_filename_prefix();
       for (var i = 0; i < blobs.length; i++) {
-        zip.file(f_gen_filename(prefix, i, 'png'), blobs[i]);
+        zip.file(f_gen_filename(prefix, i, blobs.length - 1, 'png'), blobs[i]);
       }
       zip.generateAsync({
         type: "base64"
       }).then(function (content) {
-        f_save_as( 'data:application/zip;base64,' + content, prefix + '.zip');
+        f_save_as('data:application/zip;base64,' + content, prefix + '.zip');
       });
     });
+  }
+
+  function load_all() {
+    f_log('load_all');
+    var file_input = document.createElement('input');
+    var load_all_do = function (e) {
+      f_log('load_all_do');
+      if (e.target.files[0].type !== 'application/zip') {
+        alert('The selected file is not zip archive, ignoring');
+        return;
+      }
+      var unzip = new JSZip();
+      unzip.loadAsync(e.target.files[0]).then((zip) => {
+        var promises = [];
+        zip.forEach((path, file) => {
+          f_log('path = ' + path + '; file = ' + file.name);
+          promises.push(file.async("base64"));
+        });
+        Promise.all(promises).then((data) => {
+          f_log('all files extracted');
+          f_log('data length = ' + data.length);
+          var draw = (e) => {
+            f_log('drawing loaded image');
+            e.target._canvas.getContext('2d').drawImage(e.target, 0, 0);
+          };
+          for (var i in data) {
+            var img = new Image();
+            var canvas = create_page();
+            img.onload = draw;
+            img._canvas = canvas;
+            f_log('el length = ' + data[i].length);
+            img.src = 'data:image/png;base64,' + data[i];
+          }
+        });
+      });
+    };
+    file_input.setAttribute('type', 'file');
+    file_input.setAttribute('style', 'display: none');
+    file_input.addEventListener('change', load_all_do);
+    file_input.click();
   }
 
   function console_toggle() {
@@ -280,6 +321,7 @@
   document.addEventListener('mouseup', draw_end);
   document.getElementById('add').addEventListener('click', create_page);
   document.getElementById('save_all').addEventListener('click', save_all);
+  document.getElementById('load_all').addEventListener('click', load_all);
   document.getElementById('debug').addEventListener('click', console_toggle);
   document.getElementById('console')._line_num = 0;
   document.getElementById('alpha_picker').addEventListener('change', set_alpha);
