@@ -1,5 +1,5 @@
 /*jshint esversion: 6, browser: true */
-/*global alert, JSZip */
+/*global alert, confirm, JSZip */
 (function () {
   "use strict";
 
@@ -42,23 +42,40 @@
       y: my_e.clientY - obj_pos.y
     };
   };
-  const f_save_as = (blob_or_dataurl, filename) => {
-    var a = document.createElement('a');
+  const f_save_as = (blob, filename) => {
+    var a = document.createElement('a'),
+      url = URL.createObjectURL(blob);
     a.setAttribute('download', filename);
-    a.setAttribute('href', blob_or_dataurl);
+    a.setAttribute('href', url);
     a.click();
+    URL.revokeObjectURL(url);
   };
   const f_gen_filename = (prefix, index, maxindex, extension) => {
     return prefix + '_' + f_padnum(index, maxindex) + '.' + extension;
   };
-  const f_storyboard_filename_prefix = () => {
+  const f_storyboard_name = () => {
     const header_value = document.getElementById('header').value,
       header_placeholder = document.getElementById('header').placeholder;
-    let filename = header_value ? header_value : header_placeholder;
-    return filename.replace(' ', '_').replace(/([^a-z0-9_]+)/gi, '').toLowerCase();
+    return header_value ? header_value : header_placeholder;
+  };
+  const f_set_storyboard_name = (text) => {
+    const header = document.getElementById('header');
+  };
+  const f_to_filename = (text) => {
+    return text.replace(' ', '_').replace(/([^a-z0-9_]+)/gi, '').toLowerCase();
   };
   const f_padnum = (num, max) => (num + '').length < (max + '').length ? "0".repeat((max + '').length - 1) + num : num + '';
-
+  const f_canvas_to_blob_promise = (canvas) => {
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        f_log('blob created, size ' + blob.size);
+        resolve({
+          blob: blob,
+          caption: canvas._caption.innerHTML
+        });
+      }, 'image/png');
+    });
+  };
   var pages = document.getElementById('pages'),
     canvas_w = getComputedStyle(document.body).getPropertyValue('--canvas-width'),
     canvas_h = getComputedStyle(document.body).getPropertyValue('--canvas-height'),
@@ -114,11 +131,12 @@
     clean = function () {
       this._reference.getContext('2d').clearRect(0, 0, this._reference.width, this._reference.height);
     },
-    save_single = function () {
-      const index = [...document.getElementsByTagName('canvas')].indexOf(this._reference),
-        maxindex = document.getElementsByTagName('canvas').length - 1,
-        data_url = this._reference.toDataURL("image/png");
-      f_save_as(data_url, f_gen_filename(f_storyboard_filename_prefix(), index, maxindex, 'png'));
+    save_single = function (e) {
+      const index = [...document.getElementsByTagName('canvas')].indexOf(e.target._reference),
+        maxindex = document.getElementsByTagName('canvas').length - 1;
+      f_canvas_to_blob_promise(e.target._reference).then((item) => {
+        f_save_as(item.blob, f_gen_filename(f_to_filename(f_storyboard_name()), index, maxindex, 'png'));
+      });
     },
     load = function () {
       f_log('load');
@@ -214,6 +232,7 @@
     canvas.addEventListener('touchstart', draw_start);
     canvas.addEventListener('touchmove', draw_continue);
     canvas.addEventListener('touchend', draw_end);
+    canvas._caption = caption;
     pages.appendChild(table);
     table.appendChild(tr);
     tr.appendChild(canvas_td);
@@ -239,28 +258,24 @@
 
   function save_all() {
     var canvases = [...document.getElementsByTagName('canvas')];
-    var to_blobs = canvases.map((item) => {
-      return new Promise((resolve) => {
-        item.toBlob((blob) => {
-          f_log('blob ' + item._index + ' created, size ' + blob.size);
-          resolve(blob);
-        }, 'image/png');
-      });
-    });
-    Promise.all(to_blobs).then((blobs) => {
+    var to_blobs = canvases.map(f_canvas_to_blob_promise);
+    Promise.all(to_blobs).then((items) => {
       f_log('all blobs done');
       const zip = new JSZip(),
-        prefix = f_storyboard_filename_prefix();
-      for (var i = 0; i < blobs.length; i++) {
+        storyboard_name = f_storyboard_name(),
+        prefix = f_to_filename(storyboard_name);
+      zip.folder('txt').file('name.txt', storyboard_name);
+      for (var i = 0; i < items.length; i++) {
         f_log('adding blob ' + i + ' into the zip object');
-        zip.file(f_gen_filename(prefix, i, blobs.length - 1, 'png'), blobs[i]);
+        zip.folder('img').file(f_gen_filename(prefix, i, items.length - 1, 'png'), items[i].blob);
+        zip.folder('txt').file(f_gen_filename(prefix, i, items.length - 1, 'txt'), items[i].caption);
       }
       f_log('all blobs added into the zip object');
       zip.generateAsync({
-        type: "base64"
-      }).then(function (content) {
-        f_log('saving zip');
-        f_save_as('data:application/zip;base64,' + content, prefix + '.zip');
+        type: "blob"
+      }).then(function (blob) {
+        f_log('saving zip blob');
+        f_save_as(blob, prefix + '.zip');
       });
     });
   }
@@ -269,23 +284,37 @@
     f_log('load_all');
     var file_input = document.createElement('input');
     var load_all_do = function (e) {
-      f_log('file_input.onchange - load_all_do');
-      if (e.target.files[0].type !== 'application/zip') {
-        alert('The selected file is not zip archive, ignoring');
-        return;
+      f_log('file_input.onchange - load_all_do - type = ' + e.target.files[0].type);
+      if (e.target.files[0].type.search(/zip/i) === -1) {
+        if (!confirm("The selected file's MIME type has no zip' in it, are you sure this is a zip archive?")) {
+          return;
+        }
       }
       var unzip = new JSZip();
       unzip.loadAsync(e.target.files[0]).then((zip) => {
         f_log('unzip.loadAsync');
-        var promises = [];
-        zip.forEach((path, file) => {
-          f_log('zip.forEach');
+        var img_promises = [],
+          txt_promises = [];
+        zip.folder('img').forEach((path, file) => {
+          f_log('zip.forEach - folder img');
           f_log('path = ' + path + '; file = ' + file.name);
-          promises.push(file.async("base64"));
+          img_promises.push(file.async("base64"));
         });
-        Promise.all(promises).then((data) => {
-          f_log('Promise.all - all files extracted');
-          f_log('data array length = ' + data.length);
+        zip.folder('txt').forEach((path, file) => {
+          f_log('zip.forEach - folder txt');
+          if (path === 'name.txt') {
+            file.async('string').then((text) => {
+              if (text != document.getElementById('header').placeholder) {
+                document.getElementById('header').value = text;
+              }
+            });
+          } else {
+            txt_promises.push(file.async("string"));
+          }
+        });
+        Promise.all(img_promises).then((data) => {
+          f_log('Promise.all - all images extracted');
+          f_log('image data array length = ' + data.length);
           var draw = (e) => {
             f_log('img.onload - drawing loaded image');
             e.target._canvas.getContext('2d').drawImage(e.target, 0, 0);
@@ -298,6 +327,16 @@
             f_log('data ' + i + ' length = ' + data[i].length);
             img.src = 'data:image/png;base64,' + data[i];
           }
+        }).then(() => {
+          Promise.all(txt_promises).then((data) => {
+            f_log('Promise.all - all text extracted');
+            f_log('text data array length = ' + data.length);
+            const canvases = [...document.getElementsByTagName('canvas')];
+            for (var i in canvases) {
+              f_log('setting caption ' + i);
+              canvases[i]._caption.innerHTML = data[i];
+            }
+          });
         });
       });
     };
