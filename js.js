@@ -252,11 +252,14 @@
       const zip = new JSZip(),
         prefix = f_storyboard_filename_prefix();
       for (var i = 0; i < blobs.length; i++) {
+        f_log('adding blob ' + i + ' into the zip object');
         zip.file(f_gen_filename(prefix, i, blobs.length - 1, 'png'), blobs[i]);
       }
+      f_log('all blobs added into the zip object');
       zip.generateAsync({
         type: "base64"
       }).then(function (content) {
+        f_log('saving zip');
         f_save_as('data:application/zip;base64,' + content, prefix + '.zip');
       });
     });
@@ -266,23 +269,25 @@
     f_log('load_all');
     var file_input = document.createElement('input');
     var load_all_do = function (e) {
-      f_log('load_all_do');
+      f_log('file_input.onchange - load_all_do');
       if (e.target.files[0].type !== 'application/zip') {
         alert('The selected file is not zip archive, ignoring');
         return;
       }
       var unzip = new JSZip();
       unzip.loadAsync(e.target.files[0]).then((zip) => {
+        f_log('unzip.loadAsync');
         var promises = [];
         zip.forEach((path, file) => {
+          f_log('zip.forEach');
           f_log('path = ' + path + '; file = ' + file.name);
           promises.push(file.async("base64"));
         });
         Promise.all(promises).then((data) => {
-          f_log('all files extracted');
-          f_log('data length = ' + data.length);
+          f_log('Promise.all - all files extracted');
+          f_log('data array length = ' + data.length);
           var draw = (e) => {
-            f_log('drawing loaded image');
+            f_log('img.onload - drawing loaded image');
             e.target._canvas.getContext('2d').drawImage(e.target, 0, 0);
           };
           for (var i in data) {
@@ -290,7 +295,7 @@
             var canvas = create_page();
             img.onload = draw;
             img._canvas = canvas;
-            f_log('el length = ' + data[i].length);
+            f_log('data ' + i + ' length = ' + data[i].length);
             img.src = 'data:image/png;base64,' + data[i];
           }
         });
