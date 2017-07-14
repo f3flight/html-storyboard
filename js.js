@@ -371,5 +371,9 @@
   document.getElementById('alpha_picker').addEventListener('change', set_alpha);
   document.getElementById('size_picker').addEventListener('change', set_size);
   document.getElementById('color_picker').addEventListener('change', set_color);
+  document.getElementById('toggle').addEventListener('click', () => {
+    const ctl = document.getElementById('sliding_controls');
+    ctl.style.left = ctl.style.left === '0px' ? '95%' : '0px';
+  });
   //monitor_ram();
 }());

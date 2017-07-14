@@ -119,14 +119,31 @@ canvas {
 }
 
 .floating_controls {
+  overflow: hidden;
   position: fixed;
   right: 0px;
-  bottom: 0px;
+  height: 85px;
+  bottom: var(--small-margin);
+}
+
+#sliding_controls {
+  //margin: var(--small-margin);
   display: flex;
   flex-direction: row;
   align-items: center;
+  position: relative;
+  left: 95%;
+}
+
+#toggle {
+  width: 20px;
+  height: 100%;
+  background-color: var(--border-color);
+  margin-right: var(--small-margin);
+}
+
+#color_picker {
   margin: var(--small-margin);
-  color: white;
 }
 
 #alpha_picker {

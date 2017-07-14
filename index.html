@@ -17,9 +17,12 @@
   <div id='console_placeholder' class='console_placeholder hidden'></div>
   <div id='console' class='console hidden'>[debug console]</div>
   <div class='floating_controls'>
-    trans<input id='alpha_picker' type='range' class='border button' min='1' max='255' value='255'>opaque&nbsp;&nbsp;&nbsp;small
-    <input id='size_picker' type='range' class='border button' min='1' max='100' value='1'>large&nbsp;
-    <input id='color_picker' type='color' class='border button'>
+    <div id='sliding_controls' class='border white'>
+      <dix id='toggle'></dix>
+      trans<input id='alpha_picker' type='range' class='sliding border button' min='1' max='255' value='255'>opaque&nbsp;&nbsp;&nbsp;small
+      <input id='size_picker' type='range' class='sliding border button' min='1' max='100' value='1'>large&nbsp;
+      <input id='color_picker' type='color' class='sliding small button'>
+    </div>
   </div>
   <script src='js.js'></script>
 </body>
