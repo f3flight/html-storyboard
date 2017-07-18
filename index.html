@@ -3,26 +3,52 @@
   <link rel='stylesheet' type='text/css' href='print_css.css' media='print' />
   <script src='ga.js'></script>
   <script src='jszip.min.js'></script>
+  <script src='board.js'></script>
 </head>
 
-<body>
+<body onload='board.init()'>
+
+  <!-- single page prototype  START -->
+  <table id='board_page_prototype' class='margined board_page'>
+    <tr>
+      <td rowspan=2>
+        <canvas class='border white'></canvas>
+      </td>
+      <td class='top'>
+        <div class='right-side border small white button' onclick='board.page_remove(this)'>X</div>
+      </td>
+    </tr>
+    <tr>
+      <td class='bottom'>
+        <div class='right-side border small white button' onclick='board.page_save(this)'>SAVE</div>
+        <div class='right-side border small white button' onclick='board.page_load(this)'>LOAD</div>
+        <div class='right-side border small white button' onclick='board.page_clean(this)'>WIPE</div>
+      </td>
+    </tr>
+    <tr>
+      <td class='caption_td'>
+        <div class='white border caption' placeholder='caption' contenteditable='true'></div>
+      </td>
+    </tr>
+  </table>
+  <!-- single page prototype  END -->
+
   <input id='header' type='text' class='border margined white' placeholder='untitled storyboard' />
-  <div id='pages'></div>
+  <div id='board_container'></div>
   <div id='buttons'>
-    <div id='add' class='border margined white button'>+</div>
-    <div id='save_all' class='border margined white button'>SAVE A</div>
-    <div id='load_all' class='border margined white button'>LOAD A</div>
+    <div id='add' class='border margined white button' onclick='board.create_page(this)'>+</div>
+    <div id='save_all' class='border margined white button' onclick='board.save_all()'>SAVE A</div>
+    <div id='load_all' class='border margined white button' onclick='board.load_all()'>LOAD A</div>
   </div>
-  <div id='debug' class='border margined white button'>DBG</div>
+  <div id='debug' class='border margined white button' onclick='board.console_toggle()'>DBG</div>
   <div id='console_placeholder' class='console_placeholder hidden'></div>
   <div id='console' class='console hidden'>[debug console]</div>
   <div class='floating_controls'>
     <div id='sliding_controls' class='border white'>
       <dix id='toggle'></dix>
-      trans<input id='alpha_picker' type='range' class='sliding border button' min='1' max='255' value='255'>opaque&nbsp;&nbsp;&nbsp;small
-      <input id='size_picker' type='range' class='sliding border button' min='1' max='100' value='1'>large&nbsp;
-      <input id='color_picker' type='color' class='sliding small button'>
+      trans<input id='alpha_picker' type='range' class='sliding border button' min='1' max='255' value='255' onchange='board.set_alpha(this)'>opaque&nbsp;&nbsp;&nbsp;small
+      <input id='size_picker' type='range' class='sliding border button' min='1' max='100' value='1' onchange='board.set_size(this)'>large&nbsp;
+      <input id='color_picker' type='color' class='sliding small button' onchange='board.set_color(this)'>
     </div>
   </div>
-  <script src='js.js'></script>
 </body>

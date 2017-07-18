@@ -9,6 +9,7 @@
   --large-margin: 25px;
   --padding: 5px;
   --large-font: 30px;
+  --controls-left: 95%;
 }
 
 body {
@@ -132,7 +133,7 @@ canvas {
   flex-direction: row;
   align-items: center;
   position: relative;
-  left: 95%;
+  left: var(--controls-left);
 }
 
 #toggle {
@@ -175,5 +176,9 @@ canvas {
 }
 
 .hidden {
+  display: none;
+}
+
+#board_page_prototype {
   display: none;
 }
