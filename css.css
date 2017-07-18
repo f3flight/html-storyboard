@@ -42,11 +42,6 @@ canvas {
   height: var(--canvas-height);
 }
 
-#pages {
-  display: flex;
-  flex-wrap: wrap;
-}
-
 .margined {
   margin-top: var(--small-margin);
   margin-left: var(--small-margin);
@@ -177,6 +172,11 @@ canvas {
 
 .hidden {
   display: none;
+}
+
+#board_container {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 #board_page_prototype {

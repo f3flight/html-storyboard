@@ -14,7 +14,7 @@ const board = (() => {
     file_input,
     console,
     page_prototype,
-      board_container;
+    board_container;
 
   const log = (text) => {
     console.innerHTML += '<br>';
@@ -54,7 +54,7 @@ const board = (() => {
       y: my_e.clientY - obj_pos.y
     };
   };
-  const get_page = (obj) => obj.parentElement.classList.contains('board_page') ? obj.parentElement : get_page(obj.parentElement);
+  const get_page = (obj) => obj.classList.contains('board_page') ? obj : get_page(obj.parentElement);
   const get_canvas = (obj) => get_page(obj).getElementsByTagName('canvas')[0];
   const file_save = (blob, filename) => {
     var a = document.createElement('a'),
@@ -74,7 +74,7 @@ const board = (() => {
   };
   const padnum = (num, max) => {
     num = num + '';
-    const len = (max+ '').length;
+    const len = (max + '').length;
     return num.length < len ? "0".repeat(len - 1) + num : num;
   };
   const gen_filename = (pre, ind, maxind, ext) => pre + '_' + padnum(ind, maxind) + '.' + ext;
@@ -96,6 +96,21 @@ const board = (() => {
         });
       }, 'image/png');
     });
+  };
+  const draw_image = (e) => {
+    log('draw_image - error check: ' + !e.returnValue);
+    const ctx = e.target._ctx,
+      w = e.target.naturalWidth,
+      h = e.target.naturalHeight,
+      w_scale = w / ctx.canvas.width,
+      h_scale = w / ctx.canvas.width,
+      scale = w_scale >= h_scale ? w_scale : h_scale;
+    ctx.globalAlpha = 1.0; //do not draw images semi-transparent
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.drawImage(e.target,
+      (ctx.canvas.width - w / scale) / 2,
+      (ctx.canvas.height - h / scale) / 2,
+      w / scale, h / scale);
   };
   const do_draw = (e) => {
     draw_context.globalAlpha = 1.0;
@@ -152,40 +167,27 @@ const board = (() => {
   };
   const page_load = (obj) => {
     log('page_load');
-    var ctx = get_canvas(obj).getContext('2d'),
-      image = new Image(),
-      load_do = function (e) {
-        log('load_do');
-        if (e.target.files.length > 0) {
-          log('load_do - file(s) selected');
-          log('load_do - files[0] = ' + e.target.files[0]);
-          log('load_do - files[0].type = ' + e.target.files[0].type);
-          log('load_do - files[0].size = ' + e.target.files[0].size);
-          var file_reader = new FileReader();
-          file_reader.onerror = function () {
-            log('file_reader - error');
-          };
-          file_reader.onloadend = function (e) {
-            log('file_reader.onloadend - error check: ' + e.target.error);
-            image.onload = function (e) {
-              log('image.onload - error check: ' + !e.returnValue);
-              var w = e.target.naturalWidth,
-                h = e.target.naturalHeight,
-                w_scale = w / ctx.canvas.width,
-                h_scale = w / ctx.canvas.width,
-                scale = w_scale >= h_scale ? w_scale : h_scale;
-              ctx.globalAlpha = draw_alpha;
-              ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-              ctx.drawImage(e.target,
-                (ctx.canvas.width - w / scale) / 2,
-                (ctx.canvas.height - h / scale) / 2,
-                w / scale, h / scale);
-            };
-            image.src = e.target.result;
-          };
-          file_reader.readAsDataURL(e.target.files[0]);
-        }
-      };
+    const image = new Image();
+    image._ctx = get_canvas(obj).getContext('2d');
+    const load_do = e => {
+      log('load_do');
+      if (e.target.files.length > 0) {
+        log('load_do - file(s) selected');
+        log('load_do - files[0] = ' + e.target.files[0]);
+        log('load_do - files[0].type = ' + e.target.files[0].type);
+        log('load_do - files[0].size = ' + e.target.files[0].size);
+        var file_reader = new FileReader();
+        file_reader.onerror = function () {
+          log('file_reader - error');
+        };
+        file_reader.onloadend = function (e) {
+          log('file_reader.onloadend - error check: ' + e.target.error);
+          image.onload = draw_image;
+          image.src = e.target.result;
+        };
+        file_reader.readAsDataURL(e.target.files[0]);
+      }
+    };
     image.onerror = () => log('image - error');
     file_load(load_do);
   };
@@ -280,15 +282,11 @@ const board = (() => {
         Promise.all(img_promises).then((data) => {
           log('Promise.all - all images extracted');
           log('image data array length = ' + data.length);
-          var draw = (e) => {
-            log('img.onload - drawing loaded image');
-            e.target._canvas.getContext('2d').drawImage(e.target, 0, 0);
-          };
           for (let i in data) {
             var img = new Image();
-            const canvas = pages.length > i ? pages[i] : create_page();
-            img.onload = draw;
-            img._canvas = canvas;
+            const canvas = pages.length > i ? get_canvas(pages[i]) : create_page();
+            img.onload = draw_image;
+            img._ctx = canvas.getContext('2d');
             log('data ' + i + ' length = ' + data[i].length);
             img.src = 'data:image/png;base64,' + data[i];
           }
