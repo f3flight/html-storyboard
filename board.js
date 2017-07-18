@@ -207,14 +207,14 @@ const board = (() => {
     board_container.appendChild(new_page);
     return canvas;
   };
-  const set_alpha = (e) => {
-    draw_alpha = e.target.value / 255;
+  const set_alpha = (obj) => {
+    draw_alpha = obj.value / 255;
   };
-  const set_size = (e) => {
-    line_width = e.target.value;
+  const set_size = (obj) => {
+    line_width = obj.value;
   };
-  const set_color = (e) => {
-    draw_color = e.target.value;
+  const set_color = (obj) => {
+    draw_color = obj.value;
   };
   const add_button = (parent, reference, action, text) => {
     var button = document.createElement('div');
